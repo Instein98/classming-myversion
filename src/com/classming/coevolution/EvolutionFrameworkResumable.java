@@ -87,9 +87,9 @@ public class EvolutionFrameworkResumable {
             return;
 
         // redirect the ouput to the log file
-        PrintStream newStream=new PrintStream("./"+className+(iterationLimit-iterationLeft)+".log");
-        System.setOut(newStream);
-        System.setErr(newStream);
+//        PrintStream newStream=new PrintStream("./"+className+(iterationLimit-iterationLeft)+".log");
+//        System.setOut(newStream);
+//        System.setErr(newStream);
 
         System.out.println("Iteration left: "+ iterationLeft);
         iterationLimit = iterationLeft;
@@ -421,10 +421,16 @@ public class EvolutionFrameworkResumable {
     public static void main(String[] args) throws IOException {
         EvolutionFrameworkResumable fwk = new EvolutionFrameworkResumable();
         Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
-                "../tools.jar", "org.apache.tools.ant.AntClassLoaderTest");
-        fwk.process("org.apache.tools.ant.AntClassLoader", 10000, args,
-                "./sootOutput/junit-ant/",
+                "", "com.classming.HelloTest");
+        fwk.process("com.classming.Hello", 1000, args,
+                "./sootOutput/",
                 "", "");
+
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.apache.tools.ant.AntClassLoaderTest");
+//        fwk.process("org.apache.tools.ant.AntClassLoader", 10000, args,
+//                "./sootOutput/junit-ant/",
+//                "", "");
 //        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
 //                "../tools.jar", "org.apache.tools.ant.DirectoryScannerTest");
 //        fwk.process("org.apache.tools.ant.DirectoryScanner", 10000, args,
