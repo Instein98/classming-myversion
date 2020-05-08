@@ -27,3 +27,6 @@ findPopulationsInTemp*
 /dependencies/*
 /sootOutput/*
 /src/com/classming/ModifyConstant.java
+/src/etc/
+*.py
+*.sh

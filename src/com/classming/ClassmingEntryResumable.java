@@ -33,10 +33,36 @@ public class ClassmingEntryResumable {
     }
 
     public static void process(String className, int iterationCount, String[] args, String classPath, String dependencies, String jvmOptions) throws IOException {
+        if(classPath != null && !classPath.equals("")){
+            if(classPath.contains(File.pathSeparator)){
+                int psIdx = classPath.indexOf(File.pathSeparator);
+                Main.setGenerated(classPath.substring(0, psIdx));
+                String extraCp = "";
+                for(String cpComponent: classPath.substring(psIdx+1).split(File.pathSeparator)){
+                    if(cpComponent.endsWith(".jar")){
+                        extraCp+=File.pathSeparator+cpComponent;
+                    }else{
+                        File d = new File(cpComponent);
+                        for(File f:d.listFiles()){
+                            if(f.getName().endsWith(".jar")){
+                                extraCp += File.pathSeparator + cpComponent+f.getName();
+                            }
+                        }
+                    }
+                }
+                Main.setExtraCp(extraCp);
+            }else{
+                Main.setGenerated(classPath);
+            }
+            classPath = Main.getGenerated();
+        }else{
+            classPath = "";
+        }
         List<MethodCounter> mc = readMutationCounter(classPath);
         if(leftIterationNumReaded <= 0)
             return;
         int startIteration = Math.max(iterationCount-leftIterationNumReaded, 0);
+
         // redirect the ouput to the log file
         PrintStream newStream=new PrintStream("./"+className+startIteration+".log");
         System.setOut(newStream);
@@ -44,6 +70,9 @@ public class ClassmingEntryResumable {
 
         if(leftIterationNumReaded < iterationCount)
             iterationCount = leftIterationNumReaded;
+
+        System.out.println("Iteration left: "+ iterationCount);
+
         if(classPath!=null && !classPath.equals("")){
             Main.setGenerated(classPath);
         }
@@ -142,9 +171,12 @@ public class ClassmingEntryResumable {
             String line = null;
             while((line = br.readLine())!=null){
                 if(line.contains(",")){
-                    String[] temp = line.split("[,]");
-                    String sig = temp[0];
-                    int count = Integer.parseInt(temp[1]);
+                    int pos = line.lastIndexOf(',');
+                    String temp0 = line.substring(0, pos);
+                    String temp1 = line.substring(pos+1);
+//                    String[] temp = line.split("[,]");
+                    String sig = temp0;
+                    int count = Integer.parseInt(temp1);
                     mc.add(new MethodCounter(sig, count));
                 }else if(line.contains(":")){
                     leftIterationNumReaded = Integer.parseInt(line.split("[:]")[1]);
@@ -207,7 +239,7 @@ public class ClassmingEntryResumable {
     public static void showListElement(List<String> target) {
         StringBuilder builder = new StringBuilder();
         for (String element: target) {
-            builder.append(element + " ");
+            builder.append(element + " *** ");
         }
         System.out.println(builder);
     }
@@ -224,49 +256,138 @@ public class ClassmingEntryResumable {
         }
     }
 
+    public static void makeDir(String path){
+        File f = new File(path);
+        if(!f.exists()){
+            f.mkdir();
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         cpSeparator = File.pathSeparator;
-        long startTime = System.currentTimeMillis();
+        makeDir("./AcceptHistory/");
+        makeDir("./RejectHistory/");
+        makeDir("./nolivecode/");
+        makeDir("./tmp/");
+        makeDir("./tmpRecord");
+
+//        process("org.eclipse.core.runtime.adaptor.EclipseStarter", 18000,
+//                new String[]{"-debug"}, "./sootOutput/eclipse/", null, "");
+//        process("org.apache.fop.cli.Main", 3000,
+//                new String[]{"-xml","sootOutput/fop/name.xml","-xsl","sootOutput/fop/name2fo.xsl","-pdf","sootOutput/fop/name.pdf"},
+//                "./sootOutput/fop/",
+//                "dependencies/xmlgraphics-commons-1.3.1.jar" + cpSeparator +
+//                        "dependencies/commons-logging.jar" + cpSeparator +
+//                        "dependencies/avalon-framework-4.2.0.jar" + cpSeparator +
+//                        "dependencies/batik-all.jar" + cpSeparator +
+//                        "dependencies/commons-io-1.3.1.jar", "");
+//        process("org.python.util.jython", 1676,
+//                new String[]{"sootOutput/jython/hello.py"},
+//                "./sootOutput/jython/",
+//                "dependencies/guava-r07.jar" + cpSeparator +
+//                        "dependencies/constantine.jar" + cpSeparator +
+//                        "dependencies/jnr-posix.jar" + cpSeparator +
+//                        "dependencies/jaffl.jar" + cpSeparator +
+//                        "dependencies/jline-0.9.95-SNAPSHOT.jar" + cpSeparator +
+//                        "dependencies/antlr-3.1.3.jar" + cpSeparator +
+//                        "dependencies/asm-3.1.jar", "");
+//        process("org.sunflow.Benchmark", 2081,
+//                new String[]{"-bench","2","256"},
+//                "./sootOutput/sunflow-0.07.2/",
+//                "dependencies/janino-2.5.15.jar", "");
+//
+//        process("org.apache.tools.ant.launch.Launcher", 24012,
+//                new String[]{"compile", "jar", "run"},
+//                "./sootOutput/ant/ant-launcher/",
+//                null, "");
+        process("org.apache.ivy.Main", 21602, new String[]{},
+                "sootOutput/ivy-2.5.0/",null, "");
+
+
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.apache.tools.ant.AntClassLoaderTest");
+//        process("org.apache.tools.ant.AntClassLoader", 3234, args,
+//                "./sootOutput/junit-ant/",
+//                "", "");
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.apache.tools.ant.DirectoryScannerTest");
+//        process("org.apache.tools.ant.DirectoryScanner", 194, args,
+//                "./sootOutput/junit-ant/",
+//                "", "");
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.apache.tools.ant.ProjectTest");
+//        process("org.apache.tools.ant.Project", 200, args,
+//                "./sootOutput/junit-ant/",
+//                "", "");
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.apache.tools.ant.launch.LocatorTest");
+//        process("org.apache.tools.ant.launch.Locator", 10000, args,
+//                "./sootOutput/junit-ant/",
+//                "", "");
+
+
+//        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.junit.rules.TempFolderRuleTest");
+//        process("org.junit.rules.TemporaryFolder", 5000, args,
+//                "./sootOutput/junit-junit/",
+//                "", "");
+//        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.junit.rules.TestWatcherTest");
+//        process("org.junit.rules.TestWatcher", 5000, args,
+//                "./sootOutput/junit-junit/",
+//                "", "");
+//        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.junit.internal.runners.ErrorReportingRunnerTest");
+//        process("org.junit.internal.runners.ErrorReportingRunner", 5000, args,
+//                "./sootOutput/junit-junit/",
+//                "", "");
+//        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
+//                "../tools.jar", "org.junit.samples.money.MoneyTest");
+//        process("junit.samples.money.Money", 5000, args,
+//                "./sootOutput/junit-junit/",
+//                "", "");
+
+
+
+
+
+
 
 //        process("com.classming.Hello", 1000, args, null, "", "");
-        process("avrora.Main", 3000,
-                new String[]{"-action=cfg","sootOutput/avrora-cvs-20091224/example.asm"},
-                "./sootOutput/avrora-cvs-20091224/",null, "");
+//        process("avrora.Main", 3000,
+//                new String[]{"-action=cfg","sootOutput/avrora-cvs-20091224/example.asm"},
+//                "./sootOutput/avrora-cvs-20091224/",null, "");
 //        process("org.apache.batik.apps.rasterizer.Main", 400,null,
 //                "./sootOutput/batik-all/",null, "");
-        process("org.eclipse.core.runtime.adaptor.EclipseStarter", 18000,
-                new String[]{"-debug"}, "./sootOutput/eclipse/", null, "");
-        process("org.sunflow.Benchmark", 2000,
-                new String[]{"-bench","2","256"},
-                "./sootOutput/sunflow-0.07.2/",
-                "dependencies/janino-2.5.15.jar", "");
-        process("org.apache.fop.cli.Main", 3000,
-                new String[]{"-xml","sootOutput/fop/name.xml","-xsl","sootOutput/fop/name2fo.xsl","-pdf","sootOutput/fop/name.pdf"},
-                "./sootOutput/fop/",
-                "dependencies/xmlgraphics-commons-1.3.1.jar" + cpSeparator +
-                        "dependencies/commons-logging.jar" + cpSeparator +
-                        "dependencies/avalon-framework-4.2.0.jar" + cpSeparator +
-                        "dependencies/batik-all.jar" + cpSeparator +
-                        "dependencies/commons-io-1.3.1.jar", "");
-        process("org.python.util.jython", 6000,
-                new String[]{"sootOutput/jython/hello.py"},
-                "./sootOutput/jython/",
-                "dependencies/guava-r07.jar" + cpSeparator +
-                        "dependencies/constantine.jar" + cpSeparator +
-                        "dependencies/jnr-posix.jar" + cpSeparator +
-                        "dependencies/jaffl.jar" + cpSeparator +
-                        "dependencies/jline-0.9.95-SNAPSHOT.jar" + cpSeparator +
-                        "dependencies/antlr-3.1.3.jar" + cpSeparator +
-                        "dependencies/asm-3.1.jar", "");
+//        process("org.eclipse.core.runtime.adaptor.EclipseStarter", 18000,
+//                new String[]{"-debug"}, "./sootOutput/eclipse/", null, "");
+//        process("org.sunflow.Benchmark", 2000,
+//                new String[]{"-bench","2","256"},
+//                "./sootOutput/sunflow-0.07.2/",
+//                "dependencies/janino-2.5.15.jar", "");
+//        process("org.apache.fop.cli.Main", 3000,
+//                new String[]{"-xml","sootOutput/fop/name.xml","-xsl","sootOutput/fop/name2fo.xsl","-pdf","sootOutput/fop/name.pdf"},
+//                "./sootOutput/fop/",
+//                "dependencies/xmlgraphics-commons-1.3.1.jar" + cpSeparator +
+//                        "dependencies/commons-logging.jar" + cpSeparator +
+//                        "dependencies/avalon-framework-4.2.0.jar" + cpSeparator +
+//                        "dependencies/batik-all.jar" + cpSeparator +
+//                        "dependencies/commons-io-1.3.1.jar", "");
+//        process("org.python.util.jython", 6000,
+//                new String[]{"sootOutput/jython/hello.py"},
+//                "./sootOutput/jython/",
+//                "dependencies/guava-r07.jar" + cpSeparator +
+//                        "dependencies/constantine.jar" + cpSeparator +
+//                        "dependencies/jnr-posix.jar" + cpSeparator +
+//                        "dependencies/jaffl.jar" + cpSeparator +
+//                        "dependencies/jline-0.9.95-SNAPSHOT.jar" + cpSeparator +
+//                        "dependencies/antlr-3.1.3.jar" + cpSeparator +
+//                        "dependencies/asm-3.1.jar", "");
 //        process("net.sourceforge.pmd.PMD", 2000,
 //                new String[]{"sootOutput/pmd-4.2.5/Hello.java","text","unusedcode"},
 //                "./sootOutput/pmd-4.2.5/",
 //                "dependencies/jaxen-1.1.1.jar;" +
 //                        "dependencies/asm-3.1.jar", "");  // pmd no accept
 
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("Program used time: "+(endTime-startTime)+" ms");
     }
 }

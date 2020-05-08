@@ -108,7 +108,11 @@ public class MutateClass {
             methodLiveQuery.put(method.getSignature(), changeListToSet(liveStmt));
             UsedStatementHelper.addClassMethodUsedStmt(className, method.getSignature(), usedStmt);
             methodLiveCode.put(method.getSignature(), liveStmt);
-            int callCount = previousMutationCounter == null ? 1 : previousMutationCounter.get(counter++).getCount();
+            int callCount = 1;
+            if (previousMutationCounter != null && counter < previousMutationCounter.size()){
+                callCount = previousMutationCounter.get(counter++).getCount();
+            }
+//            int callCount = previousMutationCounter == null ? 1 : previousMutationCounter.get(counter++).getCount();
             mutationCounter.add(new MethodCounter(method.getSignature(), callCount));
         }
 

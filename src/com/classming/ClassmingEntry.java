@@ -147,7 +147,7 @@ public class ClassmingEntry {
     public static void showListElement(List<String> target) {
         StringBuilder builder = new StringBuilder();
         for (String element: target) {
-            builder.append(element + " ");
+            builder.append(element + " *** ");
         }
         System.out.println(builder);
     }

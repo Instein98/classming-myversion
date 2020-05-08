@@ -569,14 +569,69 @@ public class Main {
 //        SootClass newClass = Main.loadTargetClass("org.apache.tools.ant.launch.Launcher");
 //        Main.outputClassFile(newClass);
 
+//        File x = new File("./dependencies/any23/");
+//        for(File f:x.listFiles()){
+//            if(f.getName().endsWith(".jar")){
+//                extraCp += File.pathSeparator + "./dependencies/any23/"+f.getName();
+//            }
+//        }
 
-        Main.setGenerated("./sootOutput/apache-maven-3.6.3/boot/plexus-classworlds-2.6.0/");
+//        String tmp = "sootOutput/xalan/serializer.jar" + File.pathSeparator +
+//                    "sootOutput/xalan/xercesImpl.jar" + File.pathSeparator +
+//                "sootOutput/xalan/xml-apis.jar";
+//        for(String cpComponent: tmp.split(File.pathSeparator)) {
+//            if (cpComponent.endsWith(".jar")) {
+//                extraCp += File.pathSeparator + cpComponent;
+//            }
+//        }
+//        Main.setExtraCp(extraCp);
+
+
+        String className = "org.junit.internal.runners.ErrorReportingRunner";
+        String cp = "./sootOutput/junit-junit/";
+        String cpSeparator = File.pathSeparator;
+        Main.setGenerated(cp);
+        Main.setDependencies("../hamcrest-core-1.3.jar");
+//        Main.setDependencies("dependencies/janino-2.5.15.jar");
         initial(args);
-        SootClass c = Scene.v().forceResolve("org.codehaus.plexus.classworlds.launcher.Launcher", SootClass.BODIES);
+//        SootClass c = Scene.v().forceResolve(className, SootClass.BODIES);
+        SootClass c = Main.loadTargetClass(className);
         List<SootMethod> d = c.getMethods();
         for (SootMethod method: d) {
             method.retrieveActiveBody();
         }
+        int instructionCount = 0;
+        File file = new File("inst-" + className + ".log");
+        if (!file.exists()){
+            file.createNewFile();
+        }else{
+            file.delete();
+            file.createNewFile();
+        }
+        FileWriter fw = new FileWriter(file.getPath(), true);
+        for (SootMethod method: d) {
+//            if (!method.getName().equals("findResources")){
+//                continue;
+//            }
+//            System.out.println("********findResources**********");
+            for (Unit u:method.getActiveBody().getUnits()){
+                String line = u.toString();
+//                if (!line.contains("**** Executed Line: ****")){
+                if(true){
+                    fw.write(u.toString() + "\n");
+                    System.out.println(u.toString());
+                    instructionCount++;
+                }
+            }
+        }
+        fw.close();
+//        System.out.println(c.getName());
+//        System.out.println(instructionCount);
+        System.exit(0);
+
+
+
+
         SootMethod test = d.get(18);
         for(Unit u:d.get(18).getActiveBody().getUnits()){
             System.out.println(u.toString());

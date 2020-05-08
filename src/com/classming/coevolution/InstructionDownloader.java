@@ -334,7 +334,7 @@ public class InstructionDownloader {
         }catch (Exception e){
             e.printStackTrace();
         }
-        cleanTmpFolder(currentClassPath);
+//        cleanTmpFolder(currentClassPath);
     }
 
     public static void cleanTmpFolder(String currentClassPath){
@@ -428,10 +428,10 @@ public class InstructionDownloader {
 
     public static void main(String[] args) throws IOException {
         InstructionDownloader fwk = new InstructionDownloader();
-        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
-                "", "com.classming.HelloTest");
-        fwk.process("com.classming.Hello", 1000, args,
-                "./sootOutput/", "", "", true);
+//        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
+//                "", "com.classming.HelloTest");
+//        fwk.process("com.classming.Hello", 1000, args,
+//                "./sootOutput/", "", "", true);
 //        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
 //                "../tools.jar", "org.apache.tools.ant.AntClassLoaderTest");
 //        fwk.process("org.apache.tools.ant.AntClassLoader", 10000, args,
@@ -441,7 +441,7 @@ public class InstructionDownloader {
 //                "../tools.jar", "org.apache.tools.ant.DirectoryScannerTest");
 //        fwk.process("org.apache.tools.ant.DirectoryScanner", 10000, args,
 //                "./sootOutput/junit-ant/",
-//                "", "");
+//                "", "", true);
 //        Main.useJunit("../junit-4.12.jar", "../hamcrest-core-1.3.jar",
 //                "../tools.jar", "org.apache.tools.ant.IntrospectionHelperTest");
 //        fwk.process("org.apache.tools.ant.IntrospectionHelper", 10000, args,
@@ -533,7 +533,7 @@ public class InstructionDownloader {
 //                "../tools.jar", "org.junit.internal.runners.ErrorReportingRunnerTest");
 //        fwk.process("org.junit.internal.runners.ErrorReportingRunner", 5000, args,
 //                "./sootOutput/junit-junit/",
-//                "", "");
+//                "", "", true);
 //        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
 //                "../tools.jar", "org.junit.internal.MethodSorterTest");
 //        fwk.process("org.junit.internal.MethodSorter", 5000, args,
@@ -544,11 +544,11 @@ public class InstructionDownloader {
 //        fwk.process("org.junit.experimental.categories.CategoryValidator", 5000, args,
 //                "./sootOutput/junit-junit/",
 //                "", "");
-//        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
-//                "../tools.jar", "org.junit.samples.money.MoneyTest");
-//        fwk.process("junit.samples.money.Money", 5000, args,
-//                "./sootOutput/junit-junit/",
-//                "", "");
+        Main.useJunit("", "sootOutput/junit-junit/hamcrest-core-1.3.jar",
+                "../tools.jar", "org.junit.samples.money.MoneyTest");
+        fwk.process("junit.samples.money.Money", 500, args,
+                "./sootOutput/junit-junit/",
+                "", "", true);
 
 
 
